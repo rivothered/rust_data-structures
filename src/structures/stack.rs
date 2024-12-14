@@ -62,3 +62,34 @@ impl<T> Stack<T> {
         self.data.get_mut(self.size-1)
     }
 }
+
+// Iterators
+struct IntoIter<T> (Stack<T>);
+impl <T: Clone> Iterator for IntoIter<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.0.is_empty() {
+            self.0.size -= 1;
+            self.0.data.pop()
+        } else {
+            None
+        }
+    }
+}
+
+struct Iter<'a, T: 'a> { stack: Vec<&'a T>, }
+impl <'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.stack.pop()
+    }
+}
+
+struct IterMut<'a, T: 'a> { stack: Vec<&'a mut T>, }
+impl <'a, T> Iterator for IterMut<'a, T> {
+    type Item = &'a mut T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.stack.pop()
+    }
+}
