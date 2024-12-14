@@ -4,9 +4,10 @@ pub struct Stack<T> {
     data: Vec<T>,
 }
 
+#[allow(dead_code)]
 impl<T> Stack<T> {
     // Inicializando a pilha
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             size: 0,
             data: Vec::new(),
@@ -14,29 +15,29 @@ impl<T> Stack<T> {
     }
 
     // Verificar se a pilha está vazia
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         0 == self.size
     }
 
     // Retorna o tamanho da pilha
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.size
     }
 
     // Limpar a pilha
-    fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.size = 0;
         self.data.clear();
     }
 
     // Adicionar item ao topo da pilha
-    fn push(&mut self, item: T) {
+    pub fn push(&mut self, item: T) {
         self.data.push(item);
         self.size += 1;
     }
 
     // Remover o item e retorná-lo
-    fn pop(&mut self) -> Option<T> {
+    pub fn pop(&mut self) -> Option<T> {
         if self.is_empty() {
             return None;
         }
@@ -46,7 +47,7 @@ impl<T> Stack<T> {
     }
 
     // Retorna o item do topo da pilha sem remove-lo
-    fn peek(&self) -> Option<&T> {
+    pub fn peek(&self) -> Option<&T> {
         if self.is_empty() {
             return None;
         }
@@ -54,17 +55,39 @@ impl<T> Stack<T> {
         self.data.get(self.size-1)
     }
 
-    fn peek_mut(&mut self) -> Option<&mut T> {
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
         if self.is_empty() {
             return None;
         }
 
         self.data.get_mut(self.size-1)
     }
+
+    pub fn into_iter(self) -> IntoIter<T> {
+        IntoIter(self)
+    }
+
+    pub fn iter(&self) -> Iter<T> {
+        let mut iterator = Iter { stack: Vec::new() };
+        for item in self.data.iter() {
+            iterator.stack.push(item);
+        }
+
+        iterator
+    }
+
+    pub fn iter_mut(&mut self) -> IterMut<T> {
+        let mut iterator = IterMut { stack: Vec::new() };
+        for item in self.data.iter_mut() {
+            iterator.stack.push(item);
+        }
+
+        iterator
+    }
 }
 
 // Iterators
-struct IntoIter<T> (Stack<T>);
+pub struct IntoIter<T> (Stack<T>);
 impl <T: Clone> Iterator for IntoIter<T> {
     type Item = T;
 
@@ -78,7 +101,7 @@ impl <T: Clone> Iterator for IntoIter<T> {
     }
 }
 
-struct Iter<'a, T: 'a> { stack: Vec<&'a T>, }
+pub struct Iter<'a, T: 'a> { stack: Vec<&'a T>, }
 impl <'a, T> Iterator for Iter<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
@@ -86,7 +109,7 @@ impl <'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-struct IterMut<'a, T: 'a> { stack: Vec<&'a mut T>, }
+pub struct IterMut<'a, T: 'a> { stack: Vec<&'a mut T>, }
 impl <'a, T> Iterator for IterMut<'a, T> {
     type Item = &'a mut T;
     fn next(&mut self) -> Option<Self::Item> {
